@@ -1,0 +1,21 @@
+{
+  "name": "stabletrust-server",
+  "version": "1.0.0",
+  "description": "HTTP server exposing StableTrust confidential transfer SDK endpoints",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@fairblock/stabletrust": "^1.0.18",
+    "axios": "^1.15.1",
+    "dotenv": "^17.2.3",
+    "ethers": "^6.16.0",
+    "express": "^4.19.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
