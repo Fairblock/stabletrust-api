@@ -1,7 +1,7 @@
-# StableTrust
+# Stabletrust for Private Agentic Finance
 ### Private payments for AI agents. One key. Zero traces.
 
-StableTrust enables AI agents to transact privately on EVM chains — shield tokens, transfer confidentially, withdraw silently. Balances are encrypted on-chain. No one can see what your agent holds or where it sends.
+Stabletrust enables AI agents to transact privately on EVM chains — shield tokens, transfer confidentially, withdraw silently. Balances are encrypted on-chain. No one can see what your agent holds or where it sends.
 
 **Built for the private agent economy.**
 
