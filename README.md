@@ -13,7 +13,7 @@ No SDK. No setup. Just POST.
 
 ```js
 // Shield tokens into a confidential account
-await fetch('https://stabletrust.dev/deposit', {
+await fetch('https://stabletrust-api.fairblock.network/deposit', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -47,7 +47,7 @@ EOA → [deposit] → Confidential Account → [transfer] → Recipient
 ### `POST /deposit`
 
 ```js
-const res = await fetch('https://stabletrust.dev/deposit', {
+const res = await fetch('https://stabletrust-api.fairblock.network/deposit', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -64,7 +64,7 @@ const { receipt } = await res.json()
 ### `POST /balance`
 
 ```js
-const res = await fetch('https://stabletrust.dev/balance', {
+const res = await fetch('https://stabletrust-api.fairblock.network/balance', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -80,7 +80,7 @@ const { balance } = await res.json()
 ### `POST /transfer`
 
 ```js
-const res = await fetch('https://stabletrust.dev/transfer', {
+const res = await fetch('https://stabletrust-api.fairblock.network/transfer', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -98,7 +98,7 @@ const { receipt } = await res.json()
 ### `POST /withdraw`
 
 ```js
-const res = await fetch('https://stabletrust.dev/withdraw', {
+const res = await fetch('https://stabletrust-api.fairblock.network/withdraw', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
