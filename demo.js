@@ -11,11 +11,13 @@ import axios from "axios";
 
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 
-const BASE_URL = process.env.SERVER_URL || "http://localhost:8080";
+const BASE_URL =
+  process.env.SERVER_URL || "https://stabletrust-api.fairblock.network/";
 
 const SENDER_PRIVATE_KEY = process.env.SENDER_PRIVATE_KEY;
 const RECIPIENT_ADDRESS = process.env.RECIPIENT_ADDRESS;
-const TOKEN_ADDRESS = process.env.TOKEN_ADDRESS || "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
+const TOKEN_ADDRESS =
+  process.env.TOKEN_ADDRESS || "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
 
 const DEPOSIT_AMOUNT = process.env.DEPOSIT_AMOUNT || "2000000";
 const TRANSFER_AMOUNT = process.env.TRANSFER_AMOUNT || "1000000";
@@ -49,19 +51,23 @@ function printBalance(label, balance) {
 // ─── DEMO FLOW ────────────────────────────────────────────────────────────────
 
 async function main() {
-  if (!SENDER_PRIVATE_KEY) throw new Error("SENDER_PRIVATE_KEY is required in .env");
-  if (!RECIPIENT_ADDRESS) throw new Error("RECIPIENT_ADDRESS is required in .env");
+  if (!SENDER_PRIVATE_KEY)
+    throw new Error("SENDER_PRIVATE_KEY is required in .env");
+  if (!RECIPIENT_ADDRESS)
+    throw new Error("RECIPIENT_ADDRESS is required in .env");
 
   console.log("=== StableTrust Server Demo ===\n");
 
   // 1. Deposit
-  console.log(`[1/4] Depositing ${DEPOSIT_AMOUNT} units into confidential account…`);
+  console.log(
+    `[1/4] Depositing ${DEPOSIT_AMOUNT} units into confidential account…`,
+  );
   const depositResult = await post("/deposit", {
     privateKey: SENDER_PRIVATE_KEY,
     tokenAddress: TOKEN_ADDRESS,
     amount: DEPOSIT_AMOUNT,
   });
-  console.log(`  tx hash: ${depositResult.receipt?.hash ?? "(included in receipt)"}\n`);
+  console.log(`  tx hash: ${depositResult.tx}\n`);
 
   // 2. Check balance after deposit
   console.log("[2/4] Checking confidential balance after deposit…");
@@ -73,23 +79,27 @@ async function main() {
   console.log();
 
   // 3. Transfer
-  console.log(`[3/4] Transferring ${TRANSFER_AMOUNT} units to ${RECIPIENT_ADDRESS}…`);
+  console.log(
+    `[3/4] Transferring ${TRANSFER_AMOUNT} units to ${RECIPIENT_ADDRESS}…`,
+  );
   const transferResult = await post("/transfer", {
     privateKey: SENDER_PRIVATE_KEY,
     recipientAddress: RECIPIENT_ADDRESS,
     tokenAddress: TOKEN_ADDRESS,
     amount: TRANSFER_AMOUNT,
   });
-  console.log(`  tx hash: ${transferResult.receipt?.hash ?? "(included in receipt)"}\n`);
+  console.log(`  tx hash: ${transferResult.tx}\n`);
 
   // 4. Withdraw
-  console.log(`[4/4] Withdrawing ${WITHDRAW_AMOUNT} units back to public balance…`);
+  console.log(
+    `[4/4] Withdrawing ${WITHDRAW_AMOUNT} units back to public balance…`,
+  );
   const withdrawResult = await post("/withdraw", {
     privateKey: SENDER_PRIVATE_KEY,
     tokenAddress: TOKEN_ADDRESS,
     amount: WITHDRAW_AMOUNT,
   });
-  console.log(`  tx hash: ${withdrawResult.receipt?.hash ?? "(included in receipt)"}\n`);
+  console.log(`  tx hash: ${withdrawResult.tx}\n`);
 
   // Final balance check
   console.log("[done] Final confidential balance:");

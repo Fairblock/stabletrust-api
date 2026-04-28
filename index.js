@@ -27,14 +27,6 @@ if (!CHAIN_ID) throw new Error("CHAIN_ID must be set in .env");
 
 const sharedClient = new ConfidentialTransferClient(RPC_URL, CHAIN_ID);
 
-// Serialize receipt — converts BigInt values to strings for JSON response
-function serializeReceipt(receipt) {
-  return JSON.parse(
-    JSON.stringify(receipt, (_, value) =>
-      typeof value === "bigint" ? value.toString() : value,
-    ),
-  );
-}
 
 /**
  * POST /deposit
@@ -64,7 +56,11 @@ app.post("/deposit", async (req, res) => {
       BigInt(amount),
       { waitForFinalization: waitForFinalization !== false },
     );
-    return res.json({ success: true, receipt: serializeReceipt(receipt) });
+    return res.json({
+      success: true,
+      message: "Deposit successful",
+      tx: receipt.hash || receipt.transactionHash,
+    });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
@@ -112,7 +108,11 @@ app.post("/transfer", async (req, res) => {
         waitForFinalization: waitForFinalization !== false,
       },
     );
-    return res.json({ success: true, receipt: serializeReceipt(receipt) });
+    return res.json({
+      success: true,
+      message: "Transfer successful",
+      tx: receipt.hash || receipt.transactionHash,
+    });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
@@ -155,7 +155,11 @@ app.post("/withdraw", async (req, res) => {
         waitForFinalization: waitForFinalization !== false,
       },
     );
-    return res.json({ success: true, receipt: serializeReceipt(receipt) });
+    return res.json({
+      success: true,
+      message: "Withdrawal successful",
+      tx: receipt.hash || receipt.transactionHash,
+    });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
