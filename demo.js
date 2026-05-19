@@ -22,6 +22,7 @@ const TOKEN_ADDRESS =
 const DEPOSIT_AMOUNT = process.env.DEPOSIT_AMOUNT || "2000000";
 const TRANSFER_AMOUNT = process.env.TRANSFER_AMOUNT || "1000000";
 const WITHDRAW_AMOUNT = process.env.WITHDRAW_AMOUNT || "1000000";
+const CHAIN_ID = process.env.CHAIN_ID ? Number(process.env.CHAIN_ID) : 84532;
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
@@ -66,6 +67,7 @@ async function main() {
     privateKey: SENDER_PRIVATE_KEY,
     tokenAddress: TOKEN_ADDRESS,
     amount: DEPOSIT_AMOUNT,
+    chainId: CHAIN_ID,
   });
   console.log(`  tx hash: ${depositResult.tx}\n`);
 
@@ -74,6 +76,7 @@ async function main() {
   const afterDeposit = await post("/balance", {
     privateKey: SENDER_PRIVATE_KEY,
     tokenAddress: TOKEN_ADDRESS,
+    chainId: CHAIN_ID,
   });
   printBalance(`address: ${afterDeposit.address}`, afterDeposit.balance);
   console.log();
@@ -87,6 +90,7 @@ async function main() {
     recipientAddress: RECIPIENT_ADDRESS,
     tokenAddress: TOKEN_ADDRESS,
     amount: TRANSFER_AMOUNT,
+    chainId: CHAIN_ID,
   });
   console.log(`  tx hash: ${transferResult.tx}\n`);
 
@@ -98,6 +102,7 @@ async function main() {
     privateKey: SENDER_PRIVATE_KEY,
     tokenAddress: TOKEN_ADDRESS,
     amount: WITHDRAW_AMOUNT,
+    chainId: CHAIN_ID,
   });
   console.log(`  tx hash: ${withdrawResult.tx}\n`);
 
@@ -106,6 +111,7 @@ async function main() {
   const finalBalance = await post("/balance", {
     privateKey: SENDER_PRIVATE_KEY,
     tokenAddress: TOKEN_ADDRESS,
+    chainId: CHAIN_ID,
   });
   printBalance(`address: ${finalBalance.address}`, finalBalance.balance);
 

@@ -21,6 +21,7 @@ await fetch("https://stabletrust-api.fairblock.network/deposit", {
     privateKey: process.env.AGENT_KEY,
     tokenAddress: "0x036CbD53842c5426634e7929541eC2318f3dCF7e", // USDC
     amount: "10000000", // 10 USDC
+    chainId: 84532, // Base Sepolia
   }),
 });
 ```
@@ -55,6 +56,7 @@ const res = await fetch("https://stabletrust-api.fairblock.network/deposit", {
     privateKey: process.env.AGENT_KEY,
     tokenAddress: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
     amount: "10000000",
+    chainId: 84532,
   }),
 });
 
@@ -71,6 +73,7 @@ const res = await fetch("https://stabletrust-api.fairblock.network/balance", {
   body: JSON.stringify({
     privateKey: process.env.AGENT_KEY,
     tokenAddress: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+    chainId: 84532,
   }),
 });
 
@@ -89,6 +92,7 @@ const res = await fetch("https://stabletrust-api.fairblock.network/transfer", {
     recipientAddress: "0x...recipient",
     tokenAddress: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
     amount: "5000000", // 5 USDC
+    chainId: 84532,
   }),
 });
 
@@ -106,6 +110,7 @@ const res = await fetch("https://stabletrust-api.fairblock.network/withdraw", {
     privateKey: process.env.AGENT_KEY,
     tokenAddress: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
     amount: "5000000",
+    chainId: 84532,
   }),
 });
 
@@ -124,6 +129,7 @@ const { receipt } = await res.json();
 | `privateKey`          | string  | yes      | Agent wallet private key               |
 | `tokenAddress`        | string  | yes      | ERC-20 token contract address          |
 | `amount`              | string  | yes      | Amount in token base units             |
+| `chainId`             | number  | yes      | Target network chain ID                |
 | `waitForFinalization` | boolean | no       | Wait for tx finality (default: `true`) |
 
 **`/balance`**
@@ -132,6 +138,7 @@ const { receipt } = await res.json();
 | -------------- | ------ | -------- | ------------------------------------------------------- |
 | `privateKey`   | string | yes      | Agent wallet private key (used for decryption)          |
 | `tokenAddress` | string | yes      | ERC-20 token contract address                           |
+| `chainId`      | number | yes      | Target network chain ID                                 |
 | `address`      | string | no       | Address to query — defaults to wallet from `privateKey` |
 
 **`/transfer`**
@@ -142,6 +149,7 @@ const { receipt } = await res.json();
 | `recipientAddress`    | string  | yes      | Recipient Ethereum address                      |
 | `tokenAddress`        | string  | yes      | ERC-20 token contract address                   |
 | `amount`              | string  | yes      | Amount in token base units                      |
+| `chainId`             | number  | yes      | Target network chain ID                         |
 | `useOffchainVerify`   | boolean | no       | Off-chain proof verification (default: `false`) |
 | `waitForFinalization` | boolean | no       | Wait for tx finality (default: `true`)          |
 
@@ -152,6 +160,7 @@ const { receipt } = await res.json();
 | `privateKey`          | string  | yes      | Agent wallet private key                        |
 | `tokenAddress`        | string  | yes      | ERC-20 token contract address                   |
 | `amount`              | string  | yes      | Amount in token base units                      |
+| `chainId`             | number  | yes      | Target network chain ID                         |
 | `useOffchainVerify`   | boolean | no       | Off-chain proof verification (default: `false`) |
 | `waitForFinalization` | boolean | no       | Wait for tx finality (default: `true`)          |
 

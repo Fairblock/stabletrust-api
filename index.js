@@ -17,15 +17,27 @@ app.use(
 );
 
 const PORT = process.env.PORT || 3000;
-const RPC_URL = process.env.RPC_URL;
-const CHAIN_ID = process.env.CHAIN_ID
-  ? Number(process.env.CHAIN_ID)
-  : undefined;
 
-if (!RPC_URL) throw new Error("RPC_URL must be set in .env");
-if (!CHAIN_ID) throw new Error("CHAIN_ID must be set in .env");
+const RPC_URLS = {
+  2201: "https://rpc.testnet.stable.xyz",
+  5042002: "https://rpc.testnet.arc.network",
+  84532: "https://base-testnet.api.pocket.network",
+  11155111: "https://ethereum-sepolia-rpc.publicnode.com",
+  421614: "https://arbitrum-sepolia-testnet.api.pocket.network",
+};
 
-const sharedClient = new ConfidentialTransferClient(RPC_URL, CHAIN_ID);
+const clients = {};
+
+function getClient(chainId) {
+  const rpcUrl = process.env[`RPC_URL_${chainId}`] || RPC_URLS[chainId];
+  if (!rpcUrl) {
+    throw new Error(`Unsupported chainId: ${chainId}`);
+  }
+  if (!clients[chainId]) {
+    clients[chainId] = new ConfidentialTransferClient(rpcUrl, Number(chainId));
+  }
+  return clients[chainId];
+}
 
 
 /**
@@ -35,11 +47,13 @@ const sharedClient = new ConfidentialTransferClient(RPC_URL, CHAIN_ID);
  *   privateKey          {string}         Sender wallet private key
  *   tokenAddress        {string}         ERC-20 token contract address
  *   amount              {string|number}  Amount in token base units
+ *   chainId             {number}         Chain ID
  *   waitForFinalization {boolean}        (optional, default true)
  */
 app.post("/deposit", async (req, res) => {
-  const { privateKey, tokenAddress, amount, waitForFinalization } = req.body;
+  const { privateKey, tokenAddress, amount, waitForFinalization, chainId } = req.body;
 
+  if (!chainId) return res.status(400).json({ error: "chainId is required" });
   if (!privateKey)
     return res.status(400).json({ error: "privateKey is required" });
   if (!tokenAddress)
@@ -48,9 +62,10 @@ app.post("/deposit", async (req, res) => {
     return res.status(400).json({ error: "amount is required" });
 
   try {
-    const wallet = new ethers.Wallet(privateKey, sharedClient.provider);
-    await sharedClient.ensureAccount(wallet);
-    const receipt = await sharedClient.confidentialDeposit(
+    const client = getClient(chainId);
+    const wallet = new ethers.Wallet(privateKey, client.provider);
+    await client.ensureAccount(wallet);
+    const receipt = await client.confidentialDeposit(
       wallet,
       tokenAddress,
       BigInt(amount),
@@ -74,6 +89,7 @@ app.post("/deposit", async (req, res) => {
  *   recipientAddress    {string}         Recipient Ethereum address
  *   tokenAddress        {string}         ERC-20 token contract address
  *   amount              {string|number}  Amount in token base units
+ *   chainId             {number}         Chain ID
  *   useOffchainVerify   {boolean}        (optional, default false)
  *   waitForFinalization {boolean}        (optional, default true)
  */
@@ -83,10 +99,12 @@ app.post("/transfer", async (req, res) => {
     recipientAddress,
     tokenAddress,
     amount,
+    chainId,
     useOffchainVerify,
     waitForFinalization,
   } = req.body;
 
+  if (!chainId) return res.status(400).json({ error: "chainId is required" });
   if (!privateKey)
     return res.status(400).json({ error: "privateKey is required" });
   if (!recipientAddress)
@@ -97,8 +115,9 @@ app.post("/transfer", async (req, res) => {
     return res.status(400).json({ error: "amount is required" });
 
   try {
-    const wallet = new ethers.Wallet(privateKey, sharedClient.provider);
-    const receipt = await sharedClient.confidentialTransfer(
+    const client = getClient(chainId);
+    const wallet = new ethers.Wallet(privateKey, client.provider);
+    const receipt = await client.confidentialTransfer(
       wallet,
       recipientAddress,
       tokenAddress,
@@ -125,6 +144,7 @@ app.post("/transfer", async (req, res) => {
  *   privateKey          {string}         Wallet private key
  *   tokenAddress        {string}         ERC-20 token contract address
  *   amount              {string|number}  Amount in token base units
+ *   chainId             {number}         Chain ID
  *   useOffchainVerify   {boolean}        (optional, default false)
  *   waitForFinalization {boolean}        (optional, default true)
  */
@@ -133,10 +153,12 @@ app.post("/withdraw", async (req, res) => {
     privateKey,
     tokenAddress,
     amount,
+    chainId,
     useOffchainVerify,
     waitForFinalization,
   } = req.body;
 
+  if (!chainId) return res.status(400).json({ error: "chainId is required" });
   if (!privateKey)
     return res.status(400).json({ error: "privateKey is required" });
   if (!tokenAddress)
@@ -145,8 +167,9 @@ app.post("/withdraw", async (req, res) => {
     return res.status(400).json({ error: "amount is required" });
 
   try {
-    const wallet = new ethers.Wallet(privateKey, sharedClient.provider);
-    const receipt = await sharedClient.withdraw(
+    const client = getClient(chainId);
+    const wallet = new ethers.Wallet(privateKey, client.provider);
+    const receipt = await client.withdraw(
       wallet,
       tokenAddress,
       Number(amount),
@@ -171,21 +194,24 @@ app.post("/withdraw", async (req, res) => {
  * Body:
  *   privateKey   {string}  Wallet private key (used for decryption)
  *   tokenAddress {string}  ERC-20 token contract address
+ *   chainId      {number}  Chain ID
  *   address      {string}  (optional) Address to query; defaults to wallet derived from privateKey
  */
 app.post("/balance", async (req, res) => {
-  const { privateKey, tokenAddress, address } = req.body;
+  const { privateKey, tokenAddress, chainId, address } = req.body;
 
+  if (!chainId) return res.status(400).json({ error: "chainId is required" });
   if (!privateKey)
     return res.status(400).json({ error: "privateKey is required" });
   if (!tokenAddress)
     return res.status(400).json({ error: "tokenAddress is required" });
 
   try {
-    const wallet = new ethers.Wallet(privateKey, sharedClient.provider);
+    const client = getClient(chainId);
+    const wallet = new ethers.Wallet(privateKey, client.provider);
     const queryAddress = address || (await wallet.getAddress());
-    const { privateKey: elgamalKey } = await sharedClient._deriveKeys(wallet);
-    const balance = await sharedClient.getConfidentialBalance(
+    const { privateKey: elgamalKey } = await client._deriveKeys(wallet);
+    const balance = await client.getConfidentialBalance(
       queryAddress,
       elgamalKey,
       tokenAddress,
