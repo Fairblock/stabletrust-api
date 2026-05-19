@@ -117,6 +117,7 @@ app.post("/transfer", async (req, res) => {
   try {
     const client = getClient(chainId);
     const wallet = new ethers.Wallet(privateKey, client.provider);
+    await client.ensureAccount(wallet);
     const receipt = await client.confidentialTransfer(
       wallet,
       recipientAddress,
@@ -169,6 +170,7 @@ app.post("/withdraw", async (req, res) => {
   try {
     const client = getClient(chainId);
     const wallet = new ethers.Wallet(privateKey, client.provider);
+    await client.ensureAccount(wallet);
     const receipt = await client.withdraw(
       wallet,
       tokenAddress,
@@ -209,6 +211,7 @@ app.post("/balance", async (req, res) => {
   try {
     const client = getClient(chainId);
     const wallet = new ethers.Wallet(privateKey, client.provider);
+    await client.ensureAccount(wallet);
     const queryAddress = address || (await wallet.getAddress());
     const { privateKey: elgamalKey } = await client._deriveKeys(wallet);
     const balance = await client.getConfidentialBalance(
