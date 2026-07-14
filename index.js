@@ -34,7 +34,13 @@ function getClient(chainId) {
     throw new Error(`Unsupported chainId: ${chainId}`);
   }
   if (!clients[chainId]) {
-    clients[chainId] = new ConfidentialTransferClient(rpcUrl, Number(chainId));
+    // Public testnets resolve their diamond from the SDK's built-in chain map as before..
+    // Chains without a default (eg; a local devnet on 31337) can supply the
+    // diamond explicitly via CONTRACT_ADDRESS_<chainId>
+    const contractAddress = process.env[`CONTRACT_ADDRESS_${chainId}`];
+    clients[chainId] = contractAddress
+      ? new ConfidentialTransferClient(rpcUrl, contractAddress, Number(chainId))
+      : new ConfidentialTransferClient(rpcUrl, Number(chainId));
   }
   return clients[chainId];
 }
@@ -122,7 +128,7 @@ app.post("/transfer", async (req, res) => {
       wallet,
       recipientAddress,
       tokenAddress,
-      Number(amount),
+      BigInt(amount),
       {
         useOffchainVerify: useOffchainVerify === true,
         waitForFinalization: waitForFinalization !== false,
@@ -174,7 +180,7 @@ app.post("/withdraw", async (req, res) => {
     const receipt = await client.withdraw(
       wallet,
       tokenAddress,
-      Number(amount),
+      BigInt(amount),
       {
         useOffchainVerify: useOffchainVerify === true,
         waitForFinalization: waitForFinalization !== false,
