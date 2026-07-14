@@ -15,12 +15,13 @@ const BASE_URL = process.env.SERVER_URL || "http://localhost:3000";
 
 const SENDER_PRIVATE_KEY = process.env.SENDER_PRIVATE_KEY;
 const RECIPIENT_ADDRESS = process.env.RECIPIENT_ADDRESS;
-const TOKEN_ADDRESS = "0x3600000000000000000000000000000000000000";
+const TOKEN_ADDRESS =
+  process.env.TOKEN_ADDRESS || "0x3600000000000000000000000000000000000000";
 
-const DEPOSIT_AMOUNT = "100000";
-const TRANSFER_AMOUNT = "50000";
-const WITHDRAW_AMOUNT = "50000";
-const CHAIN_ID = 5042002; // Arc Chain ID
+const DEPOSIT_AMOUNT = process.env.DEPOSIT_AMOUNT || "100000";
+const TRANSFER_AMOUNT = process.env.TRANSFER_AMOUNT || "50000";
+const WITHDRAW_AMOUNT = process.env.WITHDRAW_AMOUNT || "50000";
+const CHAIN_ID = Number(process.env.CHAIN_ID || 5042002); // default: Arc
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
@@ -54,8 +55,6 @@ async function main() {
     throw new Error("SENDER_PRIVATE_KEY is required in .env");
   if (!RECIPIENT_ADDRESS)
     throw new Error("RECIPIENT_ADDRESS is required in .env");
-  if (TOKEN_ADDRESS === "YOUR_USDC_ADDRESS_HERE")
-    throw new Error("USDC_ADDRESS is required in .env");
 
   console.log("=== StableTrust Server Demo (Arc) ===\n");
   console.log(`Using Chain ID: ${CHAIN_ID}`);
