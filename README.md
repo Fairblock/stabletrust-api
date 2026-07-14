@@ -2,7 +2,7 @@
 
 ### Private payments for AI agents. One key. Zero traces.
 
-Stabletrust enables AI agents to transact privately on EVM chains — shield tokens, transfer confidentially, withdraw silently. Balances are encrypted on-chain. No one can see what your agent holds or where it sends.
+Stabletrust enables AI agents to transact privately on EVM chains - shield tokens, transfer confidentially, withdraw silently. Balances are encrypted on-chain. No one can see what your agent holds or where it sends.
 
 **Built for the private agent economy.**
 
@@ -33,18 +33,39 @@ That's it. Your agent now has a private balance no one can read.
 ## Agent Flow
 
 ```
-EOA → [deposit] → Confidential Account → [transfer] → Recipient
-                                        → [withdraw] → EOA
+EOA → [account/create] → Confidential Account → [deposit]  → shielded balance
+                                              → [transfer] → Recipient
+Recipient → [apply] → spendable → [withdraw] → EOA
 ```
 
-1. **Deposit** — shield ERC-20 tokens. Balance becomes encrypted on-chain.
-2. **Transfer** — send privately to any address. Amount is invisible on-chain.
-3. **Withdraw** — unshield back to public ERC-20 at any time.
-4. **Balance** — your agent can always check its own decrypted balance.
+1. **Create account** - provision a confidential account (idempotent). Required before an account can receive a transfer.
+2. **Deposit** - shield ERC-20 tokens. Balance becomes encrypted on-chain.
+3. **Transfer** - send privately to any address. Amount is invisible on-chain.
+4. **Apply** - a recipient applies received funds, moving them from `pending` to `available` so they can be spent or withdrawn.
+5. **Withdraw** - unshield back to public ERC-20 at any time.
+6. **Balance** - check any account's decrypted balance. Read-only - sends no transaction.
 
 ---
 
 ## API
+
+### `POST /account/create`
+
+Provision your confidential account (idempotent). Required before an account can receive a transfer.
+
+```js
+const res = await fetch("https://stabletrust-api.fairblock.network/account/create", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    privateKey: process.env.AGENT_KEY,
+    chainId: 84532,
+  }),
+});
+
+const { address, created } = await res.json();
+// { success: true, address: '0x...', created: true }  // created:false if it already existed
+```
 
 ### `POST /deposit`
 
@@ -66,6 +87,8 @@ const { receipt } = await res.json();
 
 ### `POST /balance`
 
+Read-only - decrypts and returns the balance without sending any transaction. Returns `exists: false` with zero balances if the account hasn't been created yet.
+
 ```js
 const res = await fetch("https://stabletrust-api.fairblock.network/balance", {
   method: "POST",
@@ -77,8 +100,8 @@ const res = await fetch("https://stabletrust-api.fairblock.network/balance", {
   }),
 });
 
-const { balance } = await res.json();
-// { total: '10000000', available: '10000000', pending: '0' }
+const { exists, balance } = await res.json();
+// { exists: true, balance: { total: '10000000', available: '10000000', pending: '0' } }
 ```
 
 ### `POST /transfer`
@@ -98,6 +121,24 @@ const res = await fetch("https://stabletrust-api.fairblock.network/transfer", {
 
 const { receipt } = await res.json();
 // { hash: '0x...' }
+```
+
+### `POST /apply`
+
+Apply received funds - moves a recipient's balance from `pending` to `available` so it can be spent or withdrawn.
+
+```js
+const res = await fetch("https://stabletrust-api.fairblock.network/apply", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    privateKey: process.env.AGENT_KEY,
+    chainId: 84532,
+  }),
+});
+
+const { tx } = await res.json();
+// { success: true, message: 'Pending balance applied', tx: '0x...' }
 ```
 
 ### `POST /withdraw`
@@ -139,7 +180,7 @@ const { receipt } = await res.json();
 | `privateKey`   | string | yes      | Agent wallet private key (used for decryption)          |
 | `tokenAddress` | string | yes      | ERC-20 token contract address                           |
 | `chainId`      | number | yes      | Target network chain ID                                 |
-| `address`      | string | no       | Address to query — defaults to wallet from `privateKey` |
+| `address`      | string | no       | Address to query - defaults to wallet from `privateKey` |
 
 **`/transfer`**
 
@@ -163,6 +204,22 @@ const { receipt } = await res.json();
 | `chainId`             | number  | yes      | Target network chain ID                         |
 | `useOffchainVerify`   | boolean | no       | Off-chain proof verification (default: `false`) |
 | `waitForFinalization` | boolean | no       | Wait for tx finality (default: `true`)          |
+
+**`/account/create`**
+
+| Field                 | Type    | Required | Description                                      |
+| --------------------- | ------- | -------- | ------------------------------------------------ |
+| `privateKey`          | string  | yes      | Agent wallet private key                         |
+| `chainId`             | number  | yes      | Target network chain ID                          |
+| `waitForFinalization` | boolean | no       | Wait for account finality (default: `true`)      |
+
+**`/apply`**
+
+| Field                 | Type    | Required | Description                            |
+| --------------------- | ------- | -------- | -------------------------------------- |
+| `privateKey`          | string  | yes      | Agent wallet private key               |
+| `chainId`             | number  | yes      | Target network chain ID                |
+| `waitForFinalization` | boolean | no       | Wait for tx finality (default: `true`) |
 
 ---
 
