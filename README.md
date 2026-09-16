@@ -225,14 +225,17 @@ const { receipt } = await res.json();
 
 ## Supported Chains
 
-| Chain            | ID       |
-| ---------------- | -------- |
-| Base             | 8453     |
-| Base Sepolia     | 84532    |
-| Ethereum Sepolia | 11155111 |
-| Arbitrum Sepolia | 421614   |
-| Arc              | 5042002  |
-| Stable           | 2201     |
-| Tempo            | 42431    |
+| Chain            | ID       | Type    |
+| ---------------- | -------- | ------- |
+| Arbitrum One     | 42161    | mainnet |
+| Base Sepolia     | 84532    | testnet |
+| Ethereum Sepolia | 11155111 | testnet |
+| Arbitrum Sepolia | 421614   | testnet |
+| Arc              | 5042002  | testnet |
+| Stable           | 2201     | testnet |
+
+> **Arbitrum One is mainnet.** Confidential transfers and withdrawals
+> charge a small native-ETH protocol fee (~0.00004 ETH per transfer, ~0.00002 ETH
+> per withdrawal) in addition to gas.
 
 # stablepay-api
