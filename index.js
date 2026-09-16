@@ -24,6 +24,7 @@ const RPC_URLS = {
   84532: "https://base-testnet.api.pocket.network",
   11155111: "https://ethereum-sepolia-rpc.publicnode.com",
   421614: "https://arbitrum-sepolia-testnet.api.pocket.network",
+  42161: "https://arb1.arbitrum.io/rpc",
 };
 
 const clients = {};
