@@ -223,19 +223,58 @@ const { receipt } = await res.json();
 
 ---
 
+## Token Amounts and Decimals
+
+Every `amount` is a string in the token's smallest unit, not in whole tokens. USDC and USDT use 6 decimals on all supported chains, so `1000000` = 1 USDC.
+
+| You want to send | Pass `amount` |
+| ---------------- | ------------- |
+| 0.01 USDC        | `"10000"`     |
+| 0.1 USDC         | `"100000"`    |
+| 1 USDC           | `"1000000"`   |
+| 10 USDC          | `"10000000"`  |
+
+The same units apply to `DEPOSIT_AMOUNT`, `TRANSFER_AMOUNT` and `WITHDRAW_AMOUNT` in `.env` (`DEPOSIT_AMOUNT=2000000` deposits 2 USDC) and to the balances `/balance` returns (`"930000"` = 0.93 USDC).
+
+Confidential balances keep 2 decimal places, so the smallest amount is 0.01 (`"10000"` for USDC). Finer amounts are rounded down to the cent, and anything under 0.01 is rejected.
+
+For another token, check its `decimals()` and convert with ethers: `ethers.parseUnits("2.5", 6).toString()` returns `"2500000"`.
+
+---
+
 ## Supported Chains
 
 | Chain            | ID       | Type    |
 | ---------------- | -------- | ------- |
 | Arbitrum One     | 42161    | mainnet |
+| Base             | 8453     | mainnet |
+| Ethereum         | 1        | mainnet |
 | Base Sepolia     | 84532    | testnet |
 | Ethereum Sepolia | 11155111 | testnet |
 | Arbitrum Sepolia | 421614   | testnet |
 | Arc              | 5042002  | testnet |
 | Stable           | 2201     | testnet |
 
-> **Arbitrum One is mainnet.** Confidential transfers and withdrawals
-> charge a small native-ETH protocol fee (~0.00004 ETH per transfer, ~0.00002 ETH
-> per withdrawal) in addition to gas.
+> **Arbitrum One, Base and Ethereum are mainnets.** Confidential transfers and
+> withdrawals charge a small native-ETH protocol fee (~0.00004 ETH per transfer,
+> ~0.00002 ETH per withdrawal) in addition to gas. Withdrawals also deduct 0.001%
+> of the amount withdrawn.
 
-# stablepay-api
+---
+
+## Running locally
+
+```bash
+npm install
+cp .env.example .env   # optional: override PORT or RPC URLs
+npm run dev            # http://localhost:3000, restarts on file changes
+```
+
+`npm start` runs the server without the file watcher. To try the full flow against a running server, set the demo variables in `.env` and run `npm run demo` (or `npm run demo:arc` for Arc).
+
+Environment overrides:
+
+- `PORT`: port to listen on (default `3000`)
+- `RPC_URL_<chainId>`: RPC endpoint for a chain, for example `RPC_URL_84532`
+- `CONTRACT_ADDRESS_<chainId>`: Stabletrust contract for a chain that isn't built into the SDK (for example a local devnet)
+

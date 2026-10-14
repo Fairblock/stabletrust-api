@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "HTTP server exposing StableTrust confidential transfer SDK endpoints",
   "type": "module",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js"
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "demo": "node examples/demo.js",
+    "demo:arc": "node examples/demo-arc.js"
   },
   "dependencies": {
     "@fairblock/stabletrust": "^2.0.16",
