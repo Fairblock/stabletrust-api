@@ -4,12 +4,12 @@
  * Walks through: deposit → check balance → transfer → withdraw
  *
  * Usage:
- *   node demo-arc.js
+ *   npm run demo:arc    (or: node examples/demo-arc.js)
  */
 import "dotenv/config";
 import axios from "axios";
 
-// ─── CONFIG ──────────────────────────────────────────────────────────────────
+//  CONFIG
 
 const BASE_URL = process.env.SERVER_URL || "http://localhost:3000";
 

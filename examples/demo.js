@@ -4,12 +4,12 @@
  * Walks through: deposit → check balance → transfer → withdraw
  *
  * Usage:
- *   node demo.js
+ *   npm run demo        (or: node examples/demo.js)
  */
 import "dotenv/config";
 import axios from "axios";
 
-// ─── CONFIG ──────────────────────────────────────────────────────────────────
+// CONFIG
 
 const BASE_URL =
   process.env.SERVER_URL || "https://stabletrust-api.fairblock.network/";
@@ -19,12 +19,12 @@ const RECIPIENT_ADDRESS = process.env.RECIPIENT_ADDRESS;
 const TOKEN_ADDRESS =
   process.env.TOKEN_ADDRESS || "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
 
-const DEPOSIT_AMOUNT = "100000";
-const TRANSFER_AMOUNT = "500000";
-const WITHDRAW_AMOUNT = "500000";
+const DEPOSIT_AMOUNT = process.env.DEPOSIT_AMOUNT || "100000"; // 0.1 USDC
+const TRANSFER_AMOUNT = process.env.TRANSFER_AMOUNT || "50000"; // 0.05 USDC
+const WITHDRAW_AMOUNT = process.env.WITHDRAW_AMOUNT || "50000"; // 0.05 USDC
 const CHAIN_ID = process.env.CHAIN_ID ? Number(process.env.CHAIN_ID) : 84532;
 
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
+// HELPERS
 
 const http = axios.create({
   baseURL: BASE_URL,
@@ -49,7 +49,7 @@ function printBalance(label, balance) {
   console.log(`    pending:   ${balance.pending}`);
 }
 
-// ─── DEMO FLOW ────────────────────────────────────────────────────────────────
+// DEMO FLOW
 
 async function main() {
   if (!SENDER_PRIVATE_KEY)
